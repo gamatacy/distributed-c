@@ -5,13 +5,17 @@
 #include <sys/types.h>
 
 typedef struct {
-    int pcount;
-    pid_t *pids;
-} proc_network;
-
-typedef struct {
-  pid_t dst_pid;
+  pid_t src;
+  pid_t dst;
   int fd[2];
 } channel;
+
+typedef struct {
+  int pcount;
+  pid_t *pids;
+  channel *channels;
+} proc_network;
+
+
 
 #endif //SELF_H
