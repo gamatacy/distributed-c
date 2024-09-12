@@ -2,20 +2,26 @@
 #define SELF_H
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <sys/types.h>
 
+#include "ipc.h"
+
 typedef struct {
-  pid_t src;
-  pid_t dst;
+  local_id src;
+  local_id dst;
   int fd[2];
 } channel;
 
 typedef struct {
   int pcount;
   pid_t *pids;
+  local_id *ids;
   channel *channels;
 } proc_network;
 
+local_id get_id_by_pid(proc_network *net, pid_t pid);
+Message *create_message(uint16_t s_magic, uint16_t s_payload_len, int16_t s_type,
+                       timestamp_t s_local_time);
 
-
-#endif //SELF_H
+#endif // SELF_H

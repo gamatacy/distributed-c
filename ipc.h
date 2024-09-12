@@ -1,6 +1,7 @@
 /**
  * @file     ipc.h
- * @Author   Michael Kosyakov and Evgeniy Ivanov (ifmo.distributedclass@gmail.com)
+ * @Author   Michael Kosyakov and Evgeniy Ivanov
+ * (ifmo.distributedclass@gmail.com)
  * @date     March, 2014
  * @brief    A simple IPC library for programming assignments
  *
@@ -19,41 +20,39 @@ typedef int8_t local_id;
 typedef int16_t timestamp_t;
 
 enum {
-    MESSAGE_MAGIC = 0xAFAF,
-    MAX_MESSAGE_LEN = 4096,
-    PARENT_ID = 0,
-    MAX_PROCESS_ID = 15
+  MESSAGE_MAGIC = 0xAFAF,
+  MAX_MESSAGE_LEN = 4096,
+  PARENT_ID = 0,
+  MAX_PROCESS_ID = 15
 };
 
 typedef enum {
-    STARTED = 0,     ///< message with string (doesn't include trailing '\0')
-    DONE,            ///< message with string (doesn't include trailing '\0')
-    ACK,             ///< empty message
-    STOP,            ///< empty message
-    TRANSFER,        ///< message with TransferOrder
-    BALANCE_HISTORY, ///< message with BalanceHistory
-    CS_REQUEST,      ///< empty message
-    CS_REPLY,        ///< empty message
-    CS_RELEASE       ///< empty message
+  STARTED = 0,     ///< message with string (doesn't include trailing '\0')
+  DONE,            ///< message with string (doesn't include trailing '\0')
+  ACK,             ///< empty message
+  STOP,            ///< empty message
+  TRANSFER,        ///< message with TransferOrder
+  BALANCE_HISTORY, ///< message with BalanceHistory
+  CS_REQUEST,      ///< empty message
+  CS_REPLY,        ///< empty message
+  CS_RELEASE       ///< empty message
 } MessageType;
 
 typedef struct {
-    uint16_t     s_magic;        ///< magic signature, must be MESSAGE_MAGIC
-    uint16_t     s_payload_len;  ///< length of payload
-    int16_t      s_type;         ///< type of the message
-    timestamp_t  s_local_time;   ///< set by sender, depends on particular PA:
-                                 ///< physical time in PA2 or Lamport's scalar
-                                 ///< time in PA3
+  uint16_t s_magic;         ///< magic signature, must be MESSAGE_MAGIC
+  uint16_t s_payload_len;   ///< length of payload
+  int16_t s_type;           ///< type of the message
+  timestamp_t s_local_time; ///< set by sender, depends on particular PA:
+                            ///< physical time in PA2 or Lamport's scalar
+                            ///< time in PA3
 } __attribute__((packed)) MessageHeader;
 
-enum {
-    MAX_PAYLOAD_LEN = MAX_MESSAGE_LEN - sizeof(MessageHeader)
-};
+enum { MAX_PAYLOAD_LEN = MAX_MESSAGE_LEN - sizeof(MessageHeader) };
 
 typedef struct {
-    MessageHeader s_header;
-    char s_payload[MAX_PAYLOAD_LEN]; ///< Must be used as a buffer, unused "tail"
-                                     ///< shouldn't be transfered
+  MessageHeader s_header;
+  char s_payload[MAX_PAYLOAD_LEN]; ///< Must be used as a buffer, unused "tail"
+                                   ///< shouldn't be transfered
 } __attribute__((packed)) Message;
 
 //------------------------------------------------------------------------------
@@ -66,7 +65,7 @@ typedef struct {
  *
  * @return 0 on success, any non-zero value on error
  */
-int send(void * self, local_id dst, const Message * msg);
+int send(void *self, local_id dst, const Message *msg);
 
 //------------------------------------------------------------------------------
 
@@ -74,13 +73,13 @@ int send(void * self, local_id dst, const Message * msg);
  *
  * Send msg to all other processes including parrent.
  * Should stop on the first error.
- * 
+ *
  * @param self    Any data structure implemented by students to perform I/O
  * @param msg     Message to multicast.
  *
  * @return 0 on success, any non-zero value on error
  */
-int send_multicast(void * self, const Message * msg);
+int send_multicast(void *self, const Message *msg);
 
 //------------------------------------------------------------------------------
 
@@ -94,7 +93,7 @@ int send_multicast(void * self, const Message * msg);
  *
  * @return 0 on success, any non-zero value on error
  */
-int receive(void * self, local_id from, Message * msg);
+int receive(void *self, local_id from, Message *msg);
 
 //------------------------------------------------------------------------------
 
@@ -108,7 +107,7 @@ int receive(void * self, local_id from, Message * msg);
  *
  * @return 0 on success, any non-zero value on error
  */
-int receive_any(void * self, Message * msg);
+int receive_any(void *self, Message *msg);
 
 //------------------------------------------------------------------------------
 
