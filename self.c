@@ -20,3 +20,25 @@ Message *create_message(uint16_t s_magic, uint16_t s_payload_len,
 
   return message;
 }
+
+void close_fds(proc_network *net){
+    int channel_num = 0;
+    local_id id = get_id_by_pid(net, getpid());
+    for (int i = 0; i < net->pcount + 1; ++i){
+        for (int j = 0; j < net->pcount + 1; ++j){
+            if (i == j) continue;
+            if (net->channels[channel_num].src == id && net->channels[channel_num].dst != id){
+                // printf("closed %d\n", net->channels[channel_num].fd[0]);
+                close(net->channels[channel_num].fd[0]);
+            } else if (net->channels[channel_num].src != id && net->channels[channel_num].dst == id){
+              // printf("closed %d\n", net->channels[channel_num].fd[1]);
+                close(net->channels[channel_num].fd[1]);
+            } else {
+                // printf("closed %d %d\n", net->channels[channel_num].fd[0],net->channels[channel_num].fd[1]);
+                close(net->channels[channel_num].fd[0]);
+                close(net->channels[channel_num].fd[1]);
+            }
+            ++channel_num;
+        }
+    }
+}

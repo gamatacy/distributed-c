@@ -4,7 +4,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <fcntl.h>
 #include <unistd.h>
 
 #include "ipc.h"
@@ -76,8 +75,12 @@ int receive(void *self, local_id from, Message *msg) {
   return 1;
 
 channel_found:
-  if (read(c.fd[0], msg, sizeof(Message)) == -1) {
+  if (read(c.fd[0], msg, sizeof(MessageHeader)) == -1) {
     return 2;
+  }
+
+  if (read(c.fd[0], msg + sizeof(MessageHeader), msg->s_header.s_payload_len) == -1) {
+    return 3;
   }
 
   return 0;
@@ -90,10 +93,11 @@ int receive_any(void *self, Message *msg) {
   local_id id = get_id_by_pid(net, self_pid);
 
   for (int i = 0; i < (net->pcount + 1) * (net->pcount + 1); ++i) {
-    if (net->channels[i].dst == id) {
-      int flags = fcntl(net->channels[i].fd[0], F_GETFL, 0);
-      fcntl(net->channels[i].fd[0], F_SETFL, flags | O_NONBLOCK);
-      if (read(net->channels[i].fd[0], msg, sizeof(Message)) > 0) {
+    if (net->channels[i].dst == id && net->channels[i].fd[0] != 0) {
+      if (read(net->channels[i].fd[0], msg, sizeof(MessageHeader)) > 0) {
+        if (read(net->channels[i].fd[0], msg + sizeof(MessageHeader), msg->s_header.s_payload_len) == -1) {
+          return 1;
+        }
         return 0;
       }
     }
